@@ -1,0 +1,23 @@
+{
+  "stubbed": false,
+  "package": {
+    "repo": "seeds-cli",
+    "npmName": "@os-eco/seeds-cli",
+    "version": "0.2.5"
+  },
+  "binary": {
+    "name": "seeds",
+    "upstreamName": "sd",
+    "entrypoint": "src/index.ts",
+    "aliases": []
+  },
+  "dist": {
+    "url": "https://registry.npmjs.org/@os-eco/seeds-cli/-/seeds-cli-0.2.5.tgz",
+    "hash": "sha512-kqpsZYh2ZqFwxLWF726VmpVcKLb1nQzy1z0ucY8elqt5u0GHmPk+5EyZqo6QlmeAmujOY0HN+JskYmQmGRoQYQ=="
+  },
+  "meta": {
+    "description": "Git-native issue tracker for AI agent workflows",
+    "homepage": "https://github.com/jayminwest/seeds",
+    "licenseSpdx": "MIT"
+  }
+}

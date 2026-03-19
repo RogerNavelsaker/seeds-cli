@@ -14,6 +14,7 @@ let
     if builtins.hasAttr manifest.meta.licenseSpdx licenseMap
     then licenseMap.${manifest.meta.licenseSpdx}
     else lib.licenses.unfree;
+  aliasOutputs = manifest.binary.aliases or [ ];
   aliasWrappers = lib.concatMapStrings
     (
       alias:
@@ -21,7 +22,16 @@ let
         makeWrapper "$out/bin/${manifest.binary.name}" "$out/bin/${alias}"
       ''
     )
-    (manifest.binary.aliases or [ ]);
+    aliasOutputs;
+  aliasOutputLinks = lib.concatMapStrings
+    (
+      alias:
+      ''
+        mkdir -p "${"$" + alias}/bin"
+        ln -s "$out/bin/${alias}" "${"$" + alias}/bin/${alias}"
+      ''
+    )
+    aliasOutputs;
   basePackage = bun2nix.writeBunApplication {
     pname = manifest.package.repo;
     version = packageVersion;
@@ -49,6 +59,7 @@ symlinkJoin {
   pname = manifest.binary.name;
   version = packageVersion;
   name = "${manifest.binary.name}-${packageVersion}";
+  outputs = [ "out" ] ++ aliasOutputs;
   paths = [ basePackage ];
   nativeBuildInputs = [
     installShellFiles
@@ -64,6 +75,7 @@ exec ${lib.getExe' bun "bun"} "$entrypoint" "\$@"
 EOF
     chmod +x "$out/bin/${manifest.binary.name}"
     ${aliasWrappers}
+    ${aliasOutputLinks}
     bashCompletion="$TMPDIR/${manifest.binary.name}.bash"
     fishCompletion="$TMPDIR/${manifest.binary.name}.fish"
     zshCompletion="$TMPDIR/_${manifest.binary.name}"

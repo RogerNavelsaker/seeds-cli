@@ -9,7 +9,9 @@
     "name": "seeds",
     "upstreamName": "sd",
     "entrypoint": "src/index.ts",
-    "aliases": []
+    "aliases": [
+      "sd"
+    ]
   },
   "dist": {
     "url": "https://registry.npmjs.org/@os-eco/seeds-cli/-/seeds-cli-0.2.5.tgz",

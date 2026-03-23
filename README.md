@@ -1,4 +1,4 @@
-# seeds-cli
+# nixpkg-seeds
 
 Nix packaging for `@os-eco/seeds-cli` using Bun and `bun2nix`.
 

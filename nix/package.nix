@@ -73,8 +73,14 @@ symlinkJoin {
     rm -rf "$out/bin"
     mkdir -p "$out/bin"
     entrypoint="$(find "${basePackage}/share/${manifest.package.repo}/node_modules" -path "*/node_modules/${manifest.package.npmName}/${manifest.binary.entrypoint}" | head -n 1)"
+    mkdir -p "$out/share/${manifest.binary.name}/skill"
+    cp ${../skill/SKILL.md} "$out/share/${manifest.binary.name}/skill/SKILL.md"
     cat > "$out/bin/${manifest.binary.name}" <<EOF
 #!${lib.getExe bash}
+if [ "\$1" = "skill" ]; then
+  cat "$out/share/${manifest.binary.name}/skill/SKILL.md"
+  exit 0
+fi
 exec ${lib.getExe' bun "bun"} "$entrypoint" "\$@"
 EOF
     chmod +x "$out/bin/${manifest.binary.name}"

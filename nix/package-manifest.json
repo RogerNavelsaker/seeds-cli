@@ -3,7 +3,8 @@
   "package": {
     "repo": "seeds-cli",
     "npmName": "@os-eco/seeds-cli",
-    "version": "0.2.5"
+    "version": "0.2.5",
+    "packageRevision": 1
   },
   "binary": {
     "name": "seeds",

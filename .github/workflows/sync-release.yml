@@ -1,4 +1,4 @@
-name: Sync And Release From NPM
+name: Sync npm Source
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  sync-and-release:
+  sync-npm-source:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,8 +20,8 @@ jobs:
         with:
           bun-version: 1.3.10
 
-      - name: Sync manifest from npm
-        run: bun run sync:manifest
+      - name: Sync manifest from npm source
+        run: bun run sync:npm-source
 
       - name: Install Bun dependencies and regenerate bun.nix
         run: bun install

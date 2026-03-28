@@ -1,4 +1,4 @@
-{ bash, bun, bun2nix, installShellFiles, lib, makeWrapper, symlinkJoin }:
+{ bash, bun, bun2nix, fetchFromGitHub, installShellFiles, lib, makeWrapper, symlinkJoin }:
 
 let
   manifest = builtins.fromJSON (builtins.readFile ./package-manifest.json);
@@ -36,13 +36,25 @@ EOF
       ''
     )
     aliasOutputs;
+  seedsSrc = fetchFromGitHub {
+    owner = "RogerNavelsaker";
+    repo = "seeds";
+    rev = manifest.package.sourceRev;
+    hash = manifest.package.sourceHash;
+  };
   basePackage = bun2nix.writeBunApplication {
     pname = manifest.package.repo;
     version = packageVersion;
     packageJson = ../package.json;
-    src = lib.cleanSource ../.;
+    src = seedsSrc;
     dontUseBunBuild = true;
     dontUseBunCheck = true;
+    postPatch = ''
+      # Replace upstream packaging metadata with the synced local packaging view
+      # so the Bun install phase only sees the dependencies encoded in bun.nix.
+      cp ${../package.json} package.json
+      cp ${../bun.lock} bun.lock
+    '';
     startScript = ''
       bunx ${manifest.binary.upstreamName or manifest.binary.name} "$@"
     '';
@@ -72,7 +84,11 @@ symlinkJoin {
   postBuild = ''
     rm -rf "$out/bin"
     mkdir -p "$out/bin"
-    entrypoint="$(find "${basePackage}/share/${manifest.package.repo}/node_modules" -path "*/node_modules/${manifest.package.npmName}/${manifest.binary.entrypoint}" | head -n 1)"
+    entrypoint="${basePackage}/share/${manifest.package.repo}/${manifest.binary.entrypoint}"
+    if [ ! -f "$entrypoint" ]; then
+      echo "missing seeds entrypoint: $entrypoint" >&2
+      exit 1
+    fi
     mkdir -p "$out/share/${manifest.binary.name}/skill"
     cp ${../skill/SKILL.md} "$out/share/${manifest.binary.name}/skill/SKILL.md"
     cat > "$out/bin/${manifest.binary.name}" <<EOF

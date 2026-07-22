@@ -30,6 +30,14 @@ jobs:
             nix run nixpkgs#nix-update -- --flake default
           fi
 
+      - name: Regenerate Bun package locks
+        if: hashFiles('package.json') != ''
+        run: |
+          nix shell nixpkgs#bun -c sh -c 'bun install --lockfile-only && bun x bun2nix -o bun.nix'
+
+      - name: Verify package builds
+        run: nix build .#default --accept-flake-config --no-link
+
       - name: Automatic sync
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
